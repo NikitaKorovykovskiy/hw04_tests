@@ -1,12 +1,6 @@
 # deals/tests/tests_form.py
-import shutil
-import tempfile
-
-from posts.forms import PostForm
 from posts.models import Post, Group, User
-from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase
 from django.urls import reverse
 
 
