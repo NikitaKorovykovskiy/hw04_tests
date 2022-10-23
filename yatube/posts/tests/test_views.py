@@ -120,7 +120,7 @@ class TaskPagesTests(TestCase):
             'group': forms.models.ModelChoiceField,
         }
         for value, expected in form_fields.items():
-            form_field = response.context.get('post').fields.get(value)
+            form_field = response.context.get('form').fields.get(value)
             self.assertIsInstance(form_field, expected)
 
     def test_group_in_pages(self):
