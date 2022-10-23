@@ -12,7 +12,6 @@ class TaskPagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # Создадим запись в БД
         cls.post = Post.objects.create(
             id='2',
             author=User.objects.create_user(username='Sazan1',
@@ -26,15 +25,12 @@ class TaskPagesTests(TestCase):
 
     def setUp(self):
         self.guest_client = Client()
-        # Создаем авторизованный клиент
         self.user = User.objects.create_user(username='StasBasov')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
-    # Проверяем используемые шаблоны
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
-        # Собираем в словарь пары "имя_html_шаблона: reverse(name)"
         templates_pages_names = {
             'posts/index.html': reverse('posts:index'),
             'posts/group_list.html':
@@ -47,7 +43,6 @@ class TaskPagesTests(TestCase):
             ),
             'posts/post_create.html': reverse('posts:post_create'),
         }
-        # Проверяем, что при обращении к name вызывается соответствующий шаблон
         for template, reverse_name in templates_pages_names.items():
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
@@ -98,19 +93,6 @@ class TaskPagesTests(TestCase):
         self.assertEqual(post_text_0, 'Тестовая запись')
         self.assertEqual(post_group_0, 'Тестовый заголовой')
         self.assertEqual(post_author0, 'Sazan1')
-
-    # def test_post_edit_show_correct_context(self):
-    #     """Форма редактирования поста, отфильтрованного по id"""
-    #     response = self.authorized_client.get(
-    #         reverse('posts:post_edit', args=(self.post.id,))
-    #     )
-    #     form_fields = {
-    #         'text': forms.fields.CharField,
-    #         'group': forms.models.ModelChoiceField,
-    #     }
-    #     for value, expected in form_fields.items():
-    #         form_field = response.context['form'].fields[value]
-    #         self.assertIsInstance(form_field, expected)
 
     def test_create_post_show_correct_context(self):
         """Форма создания поста работает исправно"""

@@ -1,6 +1,6 @@
-# deals/tests/tests_form.py
 from posts.models import Post, Group, User
 from django.test import Client, TestCase
+
 from django.urls import reverse
 
 
@@ -49,7 +49,6 @@ class PostCreateFormTests(TestCase):
         )
         self.assertRedirects(response, reverse(
             'posts:post_detail', kwargs={'post_id': self.post.id}))
-        # сравним количество записей в Task до и после отправки формы
         self.assertEqual(Post.objects.count(), post_count)
         self.assertTrue(
             Post.objects.filter(

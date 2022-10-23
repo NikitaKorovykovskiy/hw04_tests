@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
+
 from posts.models import Group, Post
 
 User = get_user_model()
@@ -23,9 +24,7 @@ class TaskURLTests(TestCase):
         )
 
     def setUp(self):
-        # Создаем неавторизованный клиент
         self.guest_client = Client()
-        # Создаем пользователя
         self.user = User.objects.create_user(username='Sazan')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
