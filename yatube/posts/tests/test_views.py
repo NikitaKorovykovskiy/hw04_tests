@@ -1,9 +1,10 @@
+from django import forms
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
-from django import forms
 
-from posts.models import Post, Group, User
+from posts.models import Group, Post, User
 
 TEST_POST = 13
 User = get_user_model()
@@ -15,31 +16,51 @@ class PaginatorViewsTest(TestCase):
         self.user = User.objects.create_user(username='auth')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        self.group = Group.objects.create(title='Тестовая группа',
-                                          slug='test_group')
+        self.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test_group'
+        )
         count_post: list = []
-        for i in range(TEST_POST):
-            count_post.append(Post(text=f'Тестовый текст {i}',
-                                   group=self.group,
-                                   author=self.user))
+        for page in range(TEST_POST):
+            count_post.append(Post(
+                text=f'Тестовый текст {page}',
+                group=self.group,
+                author=self.user
+            ))
         Post.objects.bulk_create(count_post)
 
     def test_page_show_correct(self):
-        '''Проверка количества постов на первой и второй страницах. '''
+        """Проверка количества постов на первой странице. """
         variables = {
             reverse('posts:index'),
-            reverse('posts:profile',
-                    kwargs={'username': f'{self.user.username}'}),
-            reverse('posts:group_lists',
-                    kwargs={'slug': f'{self.group.slug}'})
+            reverse(
+                'posts:profile', kwargs={'username': self.user.username}
+            ),
+            reverse(
+                'posts:group_lists', kwargs={'slug': self.group.slug}
+            )
         }
         for page in variables:
-            response_1 = self.guest_client.get(page)
-            response_2 = self.guest_client.get(page + '?page=2')
-            count_posts1 = len(response_1.context['page_obj'])
-            count_posts2 = len(response_2.context['page_obj'])
-            self.assertEqual(count_posts1, 10)
-            self.assertEqual(count_posts2, 3)
+            with self.subTest(page=page):
+                response = self.guest_client.get(page)
+                self.assertEqual(len(response.context['page_obj']), 10)
+
+    def test_page_show_correct(self):
+        """Проверка количества постов на второй странице. """
+        variables = {
+            reverse('posts:index'),
+            reverse(
+                'posts:profile', kwargs={'username': self.user.username}
+            ),
+            reverse(
+                'posts:group_lists',
+                kwargs={'slug': self.group.slug}
+            )
+        }
+        for page in variables:
+            with self.subTest(page=page):
+                response = self.guest_client.get(page + '?page=2')
+                self.assertEqual(len(response.context['page_obj']), 3)
 
 
 class TaskPagesTests(TestCase):
@@ -65,15 +86,19 @@ class TaskPagesTests(TestCase):
         templates_pages_names = {
             reverse('posts:index'): 'posts/index.html',
             reverse(
-                'posts:group_lists', kwargs={'slug':
-                                             f'{self.post.group.slug}'}
+                'posts:group_lists', kwargs={
+                    'slug': self.post.group.slug}
             ): 'posts/group_list.html',
-            reverse('posts:profile',
-                    kwargs={'username':
-                            f'{self.post.author}'}): 'posts/profile.html',
-            reverse('posts:post_detail',
-                    kwargs={'post_id':
-                            self.post.id}): 'posts/post_detail.html',
+            reverse(
+                'posts:profile', kwargs={
+                    'username': self.post.author
+                }
+            ): 'posts/profile.html',
+            reverse(
+                'posts:post_detail', kwargs={
+                    'post_id': self.post.id
+                }
+            ): 'posts/post_detail.html',
             reverse('posts:post_create'): 'posts/post_create.html',
             reverse('posts:post_edit',
                     args={self.post.id}, ): 'posts/post_create.html'

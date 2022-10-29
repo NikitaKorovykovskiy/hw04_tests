@@ -42,15 +42,21 @@ class TaskURLTests(TestCase):
         templates_url_names = {
             'posts/index.html': reverse('posts:index'),
             'posts/group_list.html': reverse(
-                'posts:group_lists', kwargs={'slug':
-                                             f'{self.group.slug}'}
+                'posts:group_lists', kwargs={
+                    'slug': self.group.slug
+                }
             ),
-            'posts/profile.html': reverse('posts:profile',
-                                          kwargs={'username':
-                                                  f'{self.post.author}'}),
-            'posts/post_detail.html': reverse('posts:post_detail',
-                                              kwargs={'post_id':
-                                                      self.post.id}),
+            'posts/profile.html': reverse(
+                'posts:profile', kwargs={
+                    'username': self.post.author
+                }
+            ),
+            'posts/post_detail.html': reverse(
+                'posts:post_detail', kwargs={
+                    'post_id':
+                    self.post.id
+                }
+            ),
         }
         for template, address in templates_url_names.items():
             with self.subTest(address=address):
