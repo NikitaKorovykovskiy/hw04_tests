@@ -1,9 +1,9 @@
-from posts.models import Post, Group, User
+from http import HTTPStatus
 
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from http import HTTPStatus
+from posts.models import Post, Group, User
 
 
 class PostCreateFormTests(TestCase):
@@ -33,10 +33,12 @@ class PostCreateFormTests(TestCase):
         )
         posts = Post.objects.order_by('id').last()
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertEqual(posts.text, form_data['text'])
         self.assertRedirects(response, reverse(
             'posts:profile', kwargs={'username': self.user.username}
         ))
+        self.assertEqual(posts.text, form_data['text'])
+        self.assertEqual(posts.group.id, form_data['group'])
+        self.assertEqual(posts.author, self.post.author)
         self.assertEqual(Post.objects.count(), post_count + 1)
 
     def test_post_edit(self):
@@ -46,7 +48,6 @@ class PostCreateFormTests(TestCase):
             author=self.user,
             group=self.group
         )
-        old_text = self.post
         self.group2 = Group.objects.create(
             title='Тестовая группа2',
             slug='test_group',
@@ -55,16 +56,16 @@ class PostCreateFormTests(TestCase):
         post_count = Post.objects.count()
         form_data = {'text': 'Изменяем текст', 'group': self.group2.id}
         response = self.authorized_client.post(
-            reverse('posts:post_edit', kwargs={'post_id': old_text.id}),
+            reverse('posts:post_edit', kwargs={'post_id': self.post.id}),
             data=form_data,
             follow=True,
         )
-        posts = Post.objects.filter(text='Изменяем текст').get()
+        posts = Post.objects.get(pk=2)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertRedirects(response, reverse(
             'posts:post_detail', kwargs={'post_id': self.post.id}
         ))
         self.assertEqual(Post.objects.count(), post_count)
-        # self.assertTrue(posts.exists())
         self.assertEqual(posts.text, form_data['text'])
-        self.assertEqual(posts.group.id, form_data['group'])
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(posts.group.id, self.group2.id)
+        

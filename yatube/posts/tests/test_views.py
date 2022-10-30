@@ -21,9 +21,9 @@ class PaginatorViewsTest(TestCase):
             slug='test_group'
         )
         count_post: list = []
-        for page in range(TEST_POST):
+        for parametr in range(TEST_POST):
             count_post.append(Post(
-                text=f'Тестовый текст {page}',
+                text=f'Тестовый текст {parametr}',
                 group=self.group,
                 author=self.user
             ))
@@ -45,7 +45,7 @@ class PaginatorViewsTest(TestCase):
                 response = self.guest_client.get(page)
                 self.assertEqual(len(response.context['page_obj']), 10)
 
-    def test_page_show_correct(self):
+    def test_page_show_correct_2(self):
         """Проверка количества постов на второй странице. """
         variables = {
             reverse('posts:index'),
@@ -59,7 +59,7 @@ class PaginatorViewsTest(TestCase):
         }
         for page in variables:
             with self.subTest(page=page):
-                response = self.guest_client.get(page + '?page=2')
+                response = self.guest_client.get(page, {'page': 2})
                 self.assertEqual(len(response.context['page_obj']), 3)
 
 
@@ -152,11 +152,11 @@ class TaskPagesTests(TestCase):
             reverse('posts:index'): 'поста нет на главной',
             reverse(
                 'posts:group_lists',
-                kwargs={'slug': f'{post.group.slug}'}
+                kwargs={'slug': post.group.slug}
             ): 'поста нет в профиле',
             reverse(
                 'posts:profile',
-                kwargs={'username': f'{self.user.username}'}
+                kwargs={'username': self.user.username}
             ): 'поста нет в группе',
         }
         for template, phrase in templates_names.items():

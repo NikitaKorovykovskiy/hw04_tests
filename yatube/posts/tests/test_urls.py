@@ -85,4 +85,4 @@ class TaskURLTests(TestCase):
     def test_create_user_guest_client_dont_come(self):
         """Страница /create/ не пускает не авторизированного пользователя"""
         response = self.guest_client.get(reverse('posts:post_create'))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
