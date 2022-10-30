@@ -10,7 +10,6 @@ class TaskURLTests(TestCase):
 
     def setUp(self):
         self.guest_client = Client()
-        self.user = User.objects.create_user(username='Sazan')
 
     def test_home_url_exists_at_desired_location(self):
         """Шаблоны работают исправно."""

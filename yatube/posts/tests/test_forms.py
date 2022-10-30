@@ -68,4 +68,3 @@ class PostCreateFormTests(TestCase):
         self.assertEqual(Post.objects.count(), post_count)
         self.assertEqual(posts.text, form_data['text'])
         self.assertEqual(posts.group.id, self.group2.id)
-        
